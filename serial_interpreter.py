@@ -5,7 +5,6 @@ import struct
 import time
 import math
 from decimal import Decimal
-import vectors
 from timeit import default_timer as timer
 
 def createserialcommunication():
