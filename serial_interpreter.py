@@ -1,11 +1,14 @@
 import serial
 import numpy as np
+
+import interpolation
 import ubx_messages
 import struct
 import time
 import math
 from decimal import Decimal
 from timeit import default_timer as timer
+
 
 def createserialcommunication():
     ser = serial.Serial()  # open serial port
@@ -64,12 +67,12 @@ def pnt2line(pnt, start, end):
 """
 
 
-def angle_between(v1,v2):
+def angle_between(v1, v2):
     """ Returns the angle in radians between vectors 'v1' and 'v2'    """
     dot = v1[0] * v2[0] + v1[1] * v2[1]  # dot product
     det = v1[0] * v2[1] - v1[1] * v2[0]  # determinant
     angle = -math.atan2(det, dot)  # atan2(y, x) or atan2(sin, cos)
-    #print("Angle is", angle * (180 / math.pi))
+    # print("Angle is", angle * (180 / math.pi))
     return angle
 
 
@@ -91,7 +94,7 @@ def has_crossed_line_angle(base_ned, ser):
 def has_crossed_line_dist(base_ned, ser):
     crossed_line = False
 
-    while not (crossed_line):
+    while not crossed_line:
 
         check_num = check_bytes(ser)
         while check_num != 1:
@@ -107,7 +110,7 @@ def has_crossed_line_equation(base_ned, ser):
     crossed_line = False
     m = base_ned[1] / base_ned[0]
 
-    while not (crossed_line):
+    while not crossed_line:
 
         checknum = check_bytes(ser)
         while checknum != 1:
@@ -115,7 +118,7 @@ def has_crossed_line_equation(base_ned, ser):
         boat_ned = ubx_messages.ubxnavrelposned(ser)
         print("boat_y = ", boat_ned[1])
         print("boat_x = ", boat_ned[0] * m)
-        if (boat_ned[1] < boat_ned[0] * m):
+        if boat_ned[1] < boat_ned[0] * m:
             crossed_line = True;
 
     return
@@ -154,8 +157,8 @@ def perpendicular_distance(base_ned, boat_ned):
 
 def equation_calculation(base_ned, boat_ned):
     m = base_ned[1] / base_ned[0]
-   # print("y_component = ", boat_ned[1], "\nx_component*slope = ", boat_ned[0]*m)
-    if boat_ned[1] > boat_ned[0]*m:
+    # print("y_component = ", boat_ned[1], "\nx_component*slope = ", boat_ned[0]*m)
+    if boat_ned[1] > boat_ned[0] * m:
         return False
     return True
 
@@ -178,18 +181,25 @@ def main():
 
 
 def simulation():
-    base_ned = [100, -100, 0]
-    boat_ned = [50, -50 ,0]
+    base_ned = [100, 0]
+    boat_ned = [50, 5]
+    boat_ned_crossed = [55, -5]
 
-    angle_between(base_ned, boat_ned)
-    perpendicular_distance(base_ned, boat_ned)
+    boat_ned_1 = [50, 10]
+    boat_ned_2 = [50, 5]
+    boat_ned_3 = [50, -5]
+    boat_ned_4 = [50, -10]
 
-    equation_calculation(base_ned, boat_ned)
+    # interpolation.linear_interpolation(base_ned, boat_ned, boat_ned_crossed)
+    interpolation.nonlinear_interpolation(base_ned, boat_ned_1, boat_ned_2, boat_ned_3, boat_ned_4)
+    # angle_between(base_ned, boat_ned)
+    # perpendicular_distance(base_ned, boat_ned)
+    # equation_calculation(base_ned, boat_ned)
+    # start = timer()
+    # end = timer()
+    # print(end-start)
+    # has_crossed_line_equation(boat_ned,ser)
 
-    #start = timer()
-    #end = timer()
-    #print(end-start)
-    #has_crossed_line_equation(boat_ned,ser)
 
 # dist_line_segment(base_ned, boat_ned)
 
