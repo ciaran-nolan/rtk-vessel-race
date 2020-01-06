@@ -83,22 +83,25 @@ def main():
 
 
 def simulation():
-    base_ned = [100, 0]
-    boat_ned = [50, 0.1]
+    base_ned = [100, 100]
+    boat_ned = [40, -0.001]
     boat_ned_crossed = [55, -0.05]
     #s = createserialcommunication()
 
     #sample_data = read_sample_relposned(s)
     #print(sample_data)
-    boat_ned_1 = [50, 75]
-    boat_ned_2 = [40, 50]
-    boat_ned_3 = [25, -0.5]
+
+    boat_ned_1 = [5, 10]
+    boat_ned_2 = [25, 0.1]
+    boat_ned_3 = [55, -0.05]
     boat_ned_4 = [50, -10]
 
+    #interpolation.intersect_test()
     finish_detection.has_crossed_slope(base_ned, boat_ned)
-    #interpolation.linear_interpolation(base_ned, boat_ned_1, boat_ned_2)
-    interpolation.linear_interpolation(base_ned, boat_ned, boat_ned_crossed)
-    interpolation.nonlinear_interpolation(base_ned, boat_ned_1, boat_ned_2, boat_ned_3, boat_ned_4)
+    interpolation.linear_interpolation(base_ned, boat_ned_1, boat_ned_2)
+    #interpolation.linear_interpolation(base_ned, boat_ned, boat_ned_crossed)
+    #interpolation.nonlinear_interpolation_univariate_spline(base_ned, boat_ned_1, boat_ned_2, boat_ned_3, boat_ned_4)
+    interpolation.nonlinear_interpolation_b_spline(base_ned, boat_ned_1, boat_ned_2, boat_ned_3, boat_ned_4)
     #interpolation.nonlinear_interpolation(base_ned, sample_data[0], sample_data[1], sample_data[2], sample_data[3])
 
     # angle_between(base_ned, boat_ned)
