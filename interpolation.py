@@ -7,14 +7,16 @@ from scipy.interpolate import splprep, splev, interp1d, UnivariateSpline
 from intersection import intersection
 
 
-def linear_interpolation(base, boat1, boat2):
+def linear_interpolation(base, boat1, boat2, boat3, boat4):
+    if np.isnan(boat3) or np.isnan(boat4):
+        fig, ax = plt.subplots()
+        ax.plot([boat1[0], boat2[0]], [boat1[1], boat2[1]], marker='o')
+        ax.plot([0, base[0]], [0, base[1]])
 
-
-    fig, ax = plt.subplots()
-    ax.plot([boat1[0], boat2[0]], [boat1[1], boat2[1]], marker='o')
-    ax.plot([0, base[0]], [0, base[1]])
-
-    print(x,y)
+    else:
+        fig, ax = plt.subplots()
+        ax.plot([boat1[0], boat2[0], boat3[0], boat4[0]], [boat1[1], boat2[1], boat3[1], boat4[1]], marker='o')
+        ax.plot([0, base[0]], [0, base[1]])
 
     q = boat1
     s = np.subtract(boat2, boat1)
@@ -27,6 +29,7 @@ def linear_interpolation(base, boat1, boat2):
     if denominator != 0:
         u = numerator/denominator
         print(u)
+        print("Linear intercept", u*s[0]+boat1[0], u*s[0]+boat1[1])
 
     return u
 
@@ -36,18 +39,16 @@ def nonlinear_interpolation_b_spline(base, boat1, boat2, boat3, boat4):
     x_pts = [boat1[0], boat2[0], boat3[0], boat4[0]]
     y_pts = [boat1[1], boat2[1], boat3[1], boat4[1]]
 
-    print(x_pts, y_pts)
-    tck, u = splprep([x_pts,y_pts], u=None, s=0.0, per=0)
+    tck, u = splprep([x_pts, y_pts], u=None, s=0.0, per=0)
     u_new = np.linspace(u.min(), u.max(), 1000)
     x_new, y_new = splev(u_new, tck, der=0)
 
-    print(x_new,y_new)
     N=1000
     x = np.linspace(0, base[0], N)
     y = np.linspace(0, base[1], N)
 
-    x_intersect,y_intersect = intersection(x_new,y_new,x,y)
-    print(x_intersect,y_intersect)
+    x_intersect,y_intersect = intersection(x_new, y_new, x, y)
+    print("Non-linear Intercept: ", x_intersect[0], y_intersect[0])
 
 
     fig, ax = plt.subplots()

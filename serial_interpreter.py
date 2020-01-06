@@ -1,3 +1,4 @@
+import numpy as np
 import serial
 import ubx_messages
 import math
@@ -83,8 +84,8 @@ def main():
 
 
 def simulation():
-    base_ned = [100, 100]
-    boat_ned = [40, -0.001]
+    base_ned = [80, 20]
+    boat_ned = [999, 999]
     boat_ned_crossed = [55, -0.05]
     #s = createserialcommunication()
 
@@ -92,13 +93,13 @@ def simulation():
     #print(sample_data)
 
     boat_ned_1 = [5, 10]
-    boat_ned_2 = [25, 0.1]
+    boat_ned_2 = [30, 5]
     boat_ned_3 = [55, -0.05]
     boat_ned_4 = [50, -10]
 
     #interpolation.intersect_test()
     finish_detection.has_crossed_slope(base_ned, boat_ned)
-    interpolation.linear_interpolation(base_ned, boat_ned_1, boat_ned_2)
+    interpolation.linear_interpolation(base_ned, boat_ned_1, boat_ned_2, np.nan, np.nan)
     #interpolation.linear_interpolation(base_ned, boat_ned, boat_ned_crossed)
     #interpolation.nonlinear_interpolation_univariate_spline(base_ned, boat_ned_1, boat_ned_2, boat_ned_3, boat_ned_4)
     interpolation.nonlinear_interpolation_b_spline(base_ned, boat_ned_1, boat_ned_2, boat_ned_3, boat_ned_4)
