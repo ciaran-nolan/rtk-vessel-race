@@ -1,12 +1,17 @@
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.interpolate as spicy
+from scipy.interpolate import splprep, splev, interp1d
 
 ##linear interpolation
 def linear_interpolation(base, boat1, boat2):
-    q = boat1
 
+
+    fig, ax = plt.subplots()
+    ax.plot([boat1[0], boat2[0]], [boat1[1], boat2[1]], marker = 'o')
+    ax.plot([0, base[0]], [0, base[1]])
+
+    q = boat1
     s = np.subtract(boat2, boat1)
     print(s)
 
@@ -14,39 +19,28 @@ def linear_interpolation(base, boat1, boat2):
     numerator = np.cross(q, r)
     denominator = np.cross(r, s)
 
-    print numerator
-    print denominator
-    print("Divide!: ", numerator/denominator)
-
     if denominator != 0:
         u = numerator/denominator
-        print u
-
+        print(u)
 
     return u
 
 ##nonlinear interpolation
-def nonlinear_interpolation(base, boat1, boat2,boat3,boat4):
+def nonlinear_interpolation(base, boat1, boat2, boat3, boat4):
 
     x_pts = [boat1[0], boat2[0], boat3[0], boat4[0]]
-    # 10 equidistant x coords from 0 to 10
     y_pts = [boat1[1], boat2[1], boat3[1], boat4[1]]
 
-    print x_pts, y_pts
-    #f = spicy.interp1d(x_pts,y_pts, kind='cubic')
-    tck, f = spicy.splprep([x_pts, y_pts], s=0)
-    new_points = spicy.splev(f, tck)
-
-    #x_vals = np.linspace(0, 2 * np.pi, 50)
-    # 50 desired points
-    #y_vals = np.interp(x_vals, x_pts, y_pts)
+    print(x_pts, y_pts)
+    tck, u = splprep([x_pts,y_pts], u=None, s=0.0, per=0)
+    u_new = np.linspace(u.min(), u.max(), 1000)
+    x_new, y_new = splev(u_new, tck, der=0)
 
     fig, ax = plt.subplots()
     ax.plot(x_pts, y_pts, 'ro')
-    ax.plot(new_points[0], new_points[1], 'r-')
+    ax.plot(x_new,y_new, 'r-')
+    ax.plot([0,base[0]],[0,base[1]])
+
     plt.show()
 
-    #plt.plot(x_pts, y_pts, 'o')  # plot known data points
-    #plt.plot(f)  # plot interpolated points
-    #plt.show()
     return
