@@ -7,7 +7,7 @@ from scipy.interpolate import splprep, splev, interp1d, UnivariateSpline
 from intersection import intersection
 
 
-def linear_interpolation(base, boat1, boat2, boat3, boat4):
+def linear_interpolation_positional(base, boat1, boat2, boat3, boat4):
     if np.isnan(boat3) or np.isnan(boat4):
         fig, ax = plt.subplots()
         ax.plot([boat1[0], boat2[0]], [boat1[1], boat2[1]], marker='o')
@@ -62,6 +62,7 @@ def nonlinear_interpolation_b_spline(base, boat1, boat2, boat3, boat4):
 def nonlinear_interpolation_univariate_spline(base, boat1, boat2, boat3, boat4):
     x_pts = [boat1[0], boat2[0], boat3[0], boat4[0]]
     y_pts = [boat1[1], boat2[1], boat3[1], boat4[1]]
+
 
 
 def intersect_test():

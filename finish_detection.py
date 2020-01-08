@@ -2,7 +2,6 @@ import math
 import ubx_messages
 import serial_interpreter
 
-
 def angle_between(v1, v2):
     """ Returns the angle in radians between vectors 'v1' and 'v2'    """
     dot = v1[0] * v2[0] + v1[1] * v2[1]  # dot product
@@ -52,5 +51,7 @@ def has_crossed_slope(base_ned, boat_ned):
     print("Math 1:", base_ned[0]*boat_ned[1])
     if boat_ned[1]*base_ned[0] > base_ned[1]*boat_ned[0]:
         print("Above line")
+        return 0
     else:
         print("below")
+        return 1
