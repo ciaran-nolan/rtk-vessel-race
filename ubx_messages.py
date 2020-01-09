@@ -3,6 +3,13 @@ import serial
 import struct
 import time
 
+
+class Relpos:
+    def __init__(self, north, east, timestamp):
+        self.north = north
+        self.east = east
+        self.timestamp = timestamp
+
 def check_bytes(ser):
     ser.flush()
     bytes = []
@@ -43,7 +50,7 @@ def ubxnavposllh(ser):
     overhead = bytes[2]
     overhead2 = bytes[3]
     message_size = int.from_bytes(bytes[4:6],"little")
-    timeweek = int.from_bytes(bytes[6:10],"little")
+    timeweek = struct.unpack("<i",bytes[10:14])
     longitude = struct.unpack("<i",bytes[10:14])
     revisedlongitude = longitude[0] * 1e-7
     latitude = struct.unpack("<I",bytes[14:18])
@@ -57,8 +64,8 @@ def ubxnavposllh(ser):
 
 
 def ubxnavrelposned(ser):
-    bytes = ser.read(46)
-    #bytes=b'\xb5b\x01<(\x00\x00\x00\x00\x00\x88r3"*\x01\x00\x00\xe5\x01\x00\x00B\xff\xff\xff68\xde\x00\xee\x0e\x00\x00'
+    #bytes = ser.read(46)
+    bytes=b'\xb5b\x01<(\x00\x00\x00\x00\x00\x88r3"*\x01\x00\x00\xe5\x01\x00\x00B\xff\xff\xff68\xde\x00\xee\x0e\x00\x00'
     #headerbyte1 = bytes[0]
     #headerbyte2 = bytes[1]
     #class_byte = bytes[0]
@@ -67,7 +74,7 @@ def ubxnavrelposned(ser):
     #message_version = bytes[4]
     #reserved = bytes[5]
     #ref_station_id = bytes[6:8]
-    #timeweek = int.from_bytes(bytes[8:12], "little")
+    timeweek = struct.unpack("<L",bytes[8:12])[0]
     relposn = struct.unpack("<l",bytes[12:16])
     relpose = struct.unpack("<l", bytes[16:20])
     relposd = struct.unpack("<l", bytes[20:24])
@@ -87,7 +94,7 @@ def ubxnavrelposned(ser):
     resolvede = relpose[0] + relposhpe
     resolvedd = relposd[0] + relposhpd
 
-
+    print(timeweek)
     #lineardistance = math.sqrt(resolvedn**2+resolvede**2)/100
     #print(lineardistance)
     return [relposn[0], relpose[0], relposd[0]]

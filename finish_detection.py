@@ -2,6 +2,11 @@ import math
 import ubx_messages
 import serial_interpreter
 
+class Counter:
+    def __init__(self, boat_history_limit):
+        self.counter = 0
+        self.boat_history_limit = boat_history_limit
+
 def angle_between(v1, v2):
     """ Returns the angle in radians between vectors 'v1' and 'v2'    """
     dot = v1[0] * v2[0] + v1[1] * v2[1]  # dot product
