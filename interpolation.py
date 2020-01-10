@@ -2,7 +2,7 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import splprep, splev, interp1d, UnivariateSpline
-
+import tools
 ##linear interpolation
 import distance
 from intersection import intersection
@@ -36,12 +36,12 @@ def linear_interpolation_positional(base, boat1, boat2, boat3, boat4):
 
 
 ##nonlinear interpolation
-def nonlinear_interpolation_b_spline(base, boat_history, history_limit):
+## Note: Two Identical points will return an error from splprep
+##TODO funciton to remove duplicate points
 
+def nonlinear_interpolation_b_spline(base, boat_history):
 
-    x_pts = [boat1[0], boat2[0], boat3[0], boat4[0]]
-    y_pts = [boat1[1], boat2[1], boat3[1], boat4[1]]
-
+    x_pts, y_pts = tools.separate_x_y_coords(boat_history)
     tck, u = splprep([x_pts, y_pts], u=None, s=0.0, per=0)
     u_new = np.linspace(u.min(), u.max(), 1000)
     x_new, y_new = splev(u_new, tck, der=0)
@@ -63,10 +63,34 @@ def nonlinear_interpolation_b_spline(base, boat_history, history_limit):
     return
 
 
-def linear_interpolation_perpendicular_distance(base, boat_data_points, boat_data):
-    perpendicular_distance_data = map(distance.pnt2line(), base, boat_data)
-    print(perpendicular_distance_data)
+def linear_interpolation_shortest_distance(base, boat_data):
 
+
+
+    dis = list(map(distance.pnt2line, boat_data))
+    shortest_distance_data, timestamp = tools.shortest_distance(dis)
+    plt.plot(timestamp, shortest_distance_data)
+    plt.show()
+
+
+    print(shortest_distance_data)
+
+
+def nonlinear_interpolation_shortest_distance(base, boat_history):
+    dis = list(map(distance.pnt2line, boat_history))
+    shortest_distance_data, timestamp = tools.shortest_distance(dis)
+    tck, u = splprep([timestamp, shortest_distance_data], u=None, s=0.0, per=0)
+    u_new = np.linspace(u.min(), u.max(), 1000)
+    time_new, short_new = splev(u_new, tck, der=0)
+
+    fig, ax = plt.subplots()
+    ax.plot(timestamp, shortest_distance_data, 'ro')
+    ax.plot(time_new, short_new, 'r-')
+
+
+    plt.show()
+
+    return
 
 def intersect_test():
     a, b = 1, 2

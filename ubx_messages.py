@@ -10,6 +10,11 @@ class Relpos:
         self.east = east
         self.timestamp = timestamp
 
+class FinishPin:
+    def __init__(self, north, east):
+        self.relpos = [north, east]
+
+
 def check_bytes(ser):
     ser.flush()
     bytes = []

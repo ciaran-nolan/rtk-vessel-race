@@ -1,6 +1,7 @@
 import math
 import ubx_messages
 import serial_interpreter
+import simulation 
 
 class Counter:
     def __init__(self, boat_history_limit):

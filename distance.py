@@ -1,5 +1,5 @@
 import math
-
+import simulation
 
 def dot(v, w):
     x, y = v
@@ -57,7 +57,10 @@ def add(v, w):
 # 10 Translate nearest back to the start/end line.
 # Malcolm Kesson 16 Dec 2012
 
-def pnt2line(pnt, start, end):
+def pnt2line(boat_data):
+    pnt = boat_data[0:2]
+    start = [0, 0]
+    end = simulation.base_ned.relpos
     line_vec = vector(start, end)
     pnt_vec = vector(start, pnt)
     line_len = length(line_vec)
@@ -70,7 +73,9 @@ def pnt2line(pnt, start, end):
         t = 1.0
     nearest = scale(line_vec, t)
     dist = distance(nearest, pnt_vec)
-    nearest = add(nearest, start)
+    # if dist < 1e-9:
+    #    dist = 0
+    nearest = list(add(nearest, start))
 
-    print("Dist: ", dist, "\nNearest: ", nearest)
-    return dist, nearest
+    print("Dist: ", dist, "\nNearest: ", nearest, "\nPoint: ", pnt)
+    return [dist, boat_data[2]]

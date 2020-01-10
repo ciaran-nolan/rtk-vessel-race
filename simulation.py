@@ -5,9 +5,14 @@ import interpolation
 import tools
 import numpy as np
 import ubx_messages
+import relpos_sim_data
+
+base_ned = ubx_messages.FinishPin(8000, 6000)
+
+
 def simulation():
-    base_ned = [100, 100]
-    boat_ned = [104, 106]
+    #base_ned = ubx_messages.FinishPin(100, 100)
+    boat_ned = [104, 106, 110483600]
     boat_ned_crossed = [55, -0.05]
     # s = createserialcommunication()
 
@@ -16,23 +21,25 @@ def simulation():
     # sample_data = read_sample_relposned(s)
     # print(sample_data)
 
-    boat_ned_1 = [79, 80]
-    boat_ned_2 = [79, 79]
-    boat_ned_3 = [79, 79]
-    boat_ned_4 = [81, 78]
+    boat_ned_1 = [6000, 0, 110483600]
+    boat_ned_2 = [6000, 2000, 110484600]
+    boat_ned_3 = [6000, 4000, 110485600]
+    boat_ned_4 = [6000, 6000, 110486600]
     boat_ned_5 = []
+    base, boat_history = relpos_sim_data.test45_approach()
 
-    boat_history = np.array([boat_ned_1, boat_ned_2, boat_ned_3, boat_ned_4])
-    tools.separate_x_y_coords(boat_history)
-    serial_interpreter.perpendicular_distance(base_ned, boat_ned)
-    distance.pnt2line(boat_ned, [0, 0], base_ned)
+    #boat_history = [boat_ned_1, boat_ned_2, boat_ned_3, boat_ned_4]
+    # tools.separate_x_y_coords(boat_history)
+    # serial_interpreter.perpendicular_distance(base_ned.relpos, boat_ned)
+    # distance.pnt2line(boat_ned)
+    interpolation.linear_interpolation_shortest_distance(base_ned.relpos, boat_history)
     # interpolation.intersect_test()
     # finish_detection.has_crossed_slope(base_ned, boat_ned)
-    # interpolation.linear_interpolation_positional(base_ned, boat_ned_1, boat_ned_2, np.nan, np.nan)
+    #interpolation.linear_interpolation_positional(base_ned.relpos, boat_history)
     # interpolation.linear_interpolation(base_ned, boat_ned, boat_ned_crossed)
     # interpolation.nonlinear_interpolation_univariate_spline(base_ned, boat_ned_1, boat_ned_2, boat_ned_3, boat_ned_4)
-    # interpolation.nonlinear_interpolation_b_spline(base_ned, boat_history, counter.boat_history_limit)
-    # interpolation.nonlinear_interpolation(base_ned, sample_data[0], sample_data[1], sample_data[2], sample_data[3])
+    interpolation.nonlinear_interpolation_b_spline(base_ned.relpos, boat_history)
+    #interpolation.nonlinear_interpolation_shortest_distance(base_ned.relpos, boat_history)
 
     # angle_between(base_ned, boat_ned)
     # perpendicular_distance(base_ned, boat_ned)
