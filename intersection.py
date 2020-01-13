@@ -98,4 +98,4 @@ if __name__ == '__main__':
     plt.plot(x1, y1, c='r')
     plt.plot(x2, y2, c='g')
     plt.plot(x, y, '*k')
-    plt.show()
+

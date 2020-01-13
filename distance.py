@@ -77,5 +77,5 @@ def pnt2line(boat_data):
     #    dist = 0
     nearest = list(add(nearest, start))
 
-    print("Dist: ", dist, "\nNearest: ", nearest, "\nPoint: ", pnt)
-    return [dist, boat_data[2]]
+
+    return dist, boat_data[2]

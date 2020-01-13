@@ -53,11 +53,7 @@ def has_crossed_line_equation(base_ned, ser):
     return
 
 def has_crossed_slope(base_ned, boat_ned):
-    crossed_line = False
-    print("Math 1:", base_ned[0]*boat_ned[1])
     if boat_ned[1]*base_ned[0] > base_ned[1]*boat_ned[0]:
-        print("Above line")
         return 0
     else:
-        print("below")
         return 1

@@ -213,3 +213,69 @@ def test45_approach():
 def generate_data_45():
     base = [8000,6000]
     boat_history = []
+    timestamp1 = randint(100000, 600000)
+    boat_history.append([2000, 0, 0])
+    boat_history[0][2] = timestamp1
+    for i in range(3001):
+        if i == 0:
+            continue
+        boat_history.append([2000, i, (boat_history[i-1][2] + 2)])
+
+    print(boat_history)
+    extracted_data = extract_test_data(timestamp1, boat_history)
+    return base, boat_history, extracted_data
+
+def generate_slow_turn():
+    base = [8000, 6000]
+    x = np.linspace(2000, 5000, 3000)
+    y = 0.001*x**2 - 10000
+    boat_history = []
+    timestamp1 = randint(100000, 600000)
+
+    for i in range(len(x)):
+        if i == 0:
+            boat_history.append([x[i], y[i], timestamp1])
+        else:
+            boat_history.append([x[i], y[i], (boat_history[i-1][2]+2)])
+
+    print(boat_history)
+    extracted_data = extract_test_data(timestamp1, boat_history)
+
+    return base, boat_history, extracted_data
+
+def generate_tight_tack():
+    base = [8000, 6000]
+    x1 = np.linspace(2000, 3400, 1400)
+    x2 = np.flip(np.linspace(3000, 3399, 399))
+
+    x = np.concatenate((x1, x2), axis=0)
+
+    y1 = 0.001*x1**2 - 10000
+    y2 = (0.1*x2 - 390.596412)**2 - 1000
+
+    y = np.concatenate((y1, y2), axis=0)
+
+    boat_history = []
+    timestamp1 = randint(100000, 600000)
+
+    for i in range(len(x)):
+        if i == 0:
+            boat_history.append([x[i], y[i], timestamp1])
+        else:
+            boat_history.append([x[i], y[i], (boat_history[i - 1][2] + 2)])
+
+    extracted_data = extract_test_data(timestamp1, boat_history)
+
+    return base, boat_history, extracted_data
+
+def extract_test_data(timestamp1, boat_data):
+    extracted_data = [boat_data[0]]
+
+    for i in range(len(boat_data)):
+        if i == 0:
+            continue
+        if (boat_data[i][2] - timestamp1) % 1000 == 0:
+            extracted_data.append(boat_data[i])
+
+    print("Extract: ", extracted_data)
+    return extracted_data

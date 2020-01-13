@@ -3,9 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import splprep, splev, interp1d, UnivariateSpline
 import tools
-##linear interpolation
 import distance
 from intersection import intersection
+import finish_detection
 
 
 def linear_interpolation_positional(base, boat1, boat2, boat3, boat4):
@@ -58,37 +58,78 @@ def nonlinear_interpolation_b_spline(base, boat_history):
     ax.plot(x_new, y_new, 'r-')
     ax.plot([0, base[0]], [0, base[1]], marker='o')
     ax.plot(x_intersect, y_intersect, "*k")
-    plt.show()
+
 
     return
 
 
-def linear_interpolation_shortest_distance(base, boat_data):
+def linear_interpolation_shortest_distance(base, boat_history):
+    distances = []
+    timestamp = []
+    line_status = []
+    for i in range(len(boat_history)):
+        if i == 0:
+            distances.append(distance.pnt2line(boat_history[i])[0])
+
+            line_status.append(finish_detection.has_crossed_slope(base, boat_history[i]))
+            timestamp.append(boat_history[i][2])
+        else:
+
+            timestamp.append(boat_history[i][2])
+            boat_distance = distance.pnt2line(boat_history[i])[0]
+            above_below = finish_detection.has_crossed_slope(base, boat_history[i])
+            if above_below != line_status[i - 1]:
+                boat_distance = -1 * boat_distance
+            elif distances[i - 1] < 0:
+                boat_distance = -1 * boat_distance
+            distances.append(boat_distance)
+            line_status.append(above_below)
 
 
+    plt.plot(timestamp, distances, '-ro')
 
-    dis = list(map(distance.pnt2line, boat_data))
-    shortest_distance_data, timestamp = tools.shortest_distance(dis)
-    plt.plot(timestamp, shortest_distance_data)
-    plt.show()
-
-
-    print(shortest_distance_data)
 
 
 def nonlinear_interpolation_shortest_distance(base, boat_history):
-    dis = list(map(distance.pnt2line, boat_history))
-    shortest_distance_data, timestamp = tools.shortest_distance(dis)
-    tck, u = splprep([timestamp, shortest_distance_data], u=None, s=0.0, per=0)
+    distances = []
+    timestamp = []
+    line_status = []
+    for i in range(len(boat_history)):
+        if i == 0:
+            distances.append(distance.pnt2line(boat_history[i])[0])
+
+            line_status.append(finish_detection.has_crossed_slope(base, boat_history[i]))
+            timestamp.append(boat_history[i][2])
+        else:
+
+            timestamp.append(boat_history[i][2])
+            boat_distance = distance.pnt2line(boat_history[i])[0]
+            above_below = finish_detection.has_crossed_slope(base, boat_history[i])
+            if above_below != line_status[i-1]:
+                boat_distance = -1*boat_distance
+            elif distances[i-1] < 0:
+                boat_distance = -1*boat_distance
+            distances.append(boat_distance)
+            line_status.append(above_below)
+
+    print(distances)
+    tck, u = splprep([timestamp, distances], u=None, s=0.0, per=0)
     u_new = np.linspace(u.min(), u.max(), 1000)
     time_new, short_new = splev(u_new, tck, der=0)
 
+    intercept_x = np.linspace(timestamp[0],timestamp[len(timestamp)-1],len(timestamp))
+    intercept_y = np.zeros(len(timestamp))
+
+    x_intersect, y_intersect = intersection(time_new, short_new, intercept_x, intercept_y)
+    print("Non-linear Intercept: ", x_intersect[0], y_intersect[0])
+
     fig, ax = plt.subplots()
-    ax.plot(timestamp, shortest_distance_data, 'ro')
+    ax.plot(timestamp, distances, 'ro')
     ax.plot(time_new, short_new, 'r-')
+    ax.plot(intercept_x, intercept_y)
+    ax.plot(x_intersect, y_intersect, '*k')
+    ax.title.set_text('Non-linear, Shortest')
 
-
-    plt.show()
 
     return
 
@@ -105,4 +146,4 @@ def intersect_test():
     plt.plot(x1, y1, c="r")
     plt.plot(x2, y2, c="g")
     plt.plot(x, y, "*k")
-    plt.show()
+
