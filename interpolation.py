@@ -91,9 +91,11 @@ def linear_interpolation_shortest_distance(base, boat_history):
 
 
 def nonlinear_interpolation_shortest_distance(base, boat_history):
+
     distances = []
     timestamp = []
     line_status = []
+
     for i in range(len(boat_history)):
         if i == 0:
             distances.append(distance.pnt2line(boat_history[i])[0])
@@ -112,15 +114,16 @@ def nonlinear_interpolation_shortest_distance(base, boat_history):
             distances.append(boat_distance)
             line_status.append(above_below)
 
-    print(distances)
+
     tck, u = splprep([timestamp, distances], u=None, s=0.0, per=0)
     u_new = np.linspace(u.min(), u.max(), 1000)
     time_new, short_new = splev(u_new, tck, der=0)
 
-    intercept_x = np.linspace(timestamp[0],timestamp[len(timestamp)-1],len(timestamp))
+    intercept_x = np.linspace(timestamp[0],timestamp[len(timestamp)-1], len(timestamp))
     intercept_y = np.zeros(len(timestamp))
 
     x_intersect, y_intersect = intersection(time_new, short_new, intercept_x, intercept_y)
+
     print("Non-linear Intercept: ", x_intersect[0], y_intersect[0])
 
     fig, ax = plt.subplots()
@@ -131,7 +134,7 @@ def nonlinear_interpolation_shortest_distance(base, boat_history):
     ax.title.set_text('Non-linear, Shortest')
 
 
-    return
+    return x_intersect[0], y_intersect[0]
 
 def intersect_test():
     a, b = 1, 2

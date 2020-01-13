@@ -268,6 +268,37 @@ def generate_tight_tack():
 
     return base, boat_history, extracted_data
 
+def upwind_tacks():
+    base = [8000, 6000]
+    x1 = np.linspace(4000, 4500, 1000)
+    x2 = np.linspace(4501,5000, 998)
+    x3 = np.flip(np.linspace(4500, 4999, 998))
+    x4 = np.linspace(4501, 5000, 998)
+    x5 = np.flip(np.linspace(4500, 4999, 998))
+
+    x = np.concatenate((x1, x2, x3, x4, x5), axis=0)
+
+    y1 = (0.1 * x1 - 400) ** 2
+    y2 = x2 - 2000
+    y3 = 3000 + 0 * x3
+    y4 = x4 - 1500
+    y5 = -1 * x5 + 8500
+
+    y = np.concatenate((y1, y2, y3, y4, y5), axis=0)
+
+    boat_history = []
+    timestamp1 = randint(100000, 600000)
+
+    for i in range(len(x)):
+        if i == 0:
+            boat_history.append([x[i], y[i], timestamp1])
+        else:
+            boat_history.append([x[i], y[i], (boat_history[i - 1][2] + 2)])
+
+    extracted_data = extract_test_data(timestamp1, boat_history)
+
+    return base, boat_history, extracted_data
+
 def extract_test_data(timestamp1, boat_data):
     extracted_data = [boat_data[0]]
 
@@ -277,5 +308,4 @@ def extract_test_data(timestamp1, boat_data):
         if (boat_data[i][2] - timestamp1) % 1000 == 0:
             extracted_data.append(boat_data[i])
 
-    print("Extract: ", extracted_data)
     return extracted_data
