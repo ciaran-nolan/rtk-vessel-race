@@ -299,6 +299,11 @@ def upwind_tacks():
 
     return base, boat_history, extracted_data
 
+
+def tack_test_2():
+    #tack 1 - Boat is accelerating
+    x1 = np.linspace(4000, 4500, 1000)
+
 def extract_test_data(timestamp1, boat_data):
     extracted_data = [boat_data[0]]
 
@@ -309,3 +314,4 @@ def extract_test_data(timestamp1, boat_data):
             extracted_data.append(boat_data[i])
 
     return extracted_data
+

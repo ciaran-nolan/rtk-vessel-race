@@ -86,10 +86,23 @@ def linear_interpolation_shortest_distance(base, boat_history):
             line_status.append(above_below)
 
 
+    intercept_x = np.linspace(timestamp[0],timestamp[len(timestamp)-1], len(timestamp))
+    intercept_y = np.zeros(len(timestamp))
+
+    x_intersect, y_intersect = intersection(np.array(timestamp), np.array(distances), intercept_x, intercept_y)
+
+    print("Non-linear Intercept: ", x_intersect[0], y_intersect[0])
+
+    fig, ax = plt.subplots()
+    ax.plot(timestamp, distances, 'ro')
+    ax.plot(intercept_x, intercept_y)
+    ax.plot(x_intersect, y_intersect, '*k')
+    ax.title.set_text('Non-linear, Shortest')
+
     plt.plot(timestamp, distances, '-ro')
 
 
-
+##Non Linear Interpolation of Data Set Points Using Shortest Distance To Finish Line
 def nonlinear_interpolation_shortest_distance(base, boat_history):
 
     distances = []
@@ -135,18 +148,3 @@ def nonlinear_interpolation_shortest_distance(base, boat_history):
 
 
     return x_intersect[0], y_intersect[0]
-
-def intersect_test():
-    a, b = 1, 2
-    phi = np.linspace(3, 10, 100)
-    x1 = a * phi - b * np.sin(phi)
-    y1 = a - b * np.cos(phi)
-
-    x2 = phi
-    y2 = np.sin(phi) + 2
-    x, y = intersection(x1, y1, x2, y2)
-
-    plt.plot(x1, y1, c="r")
-    plt.plot(x2, y2, c="g")
-    plt.plot(x, y, "*k")
-
