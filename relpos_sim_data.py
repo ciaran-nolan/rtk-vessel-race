@@ -1,6 +1,7 @@
 ## approach line from a 45 degree angle
 from random import randint
 import numpy as np
+import math
 
 
 def test45_approach():
@@ -298,6 +299,37 @@ def upwind_tacks():
     extracted_data = extract_test_data(timestamp1, boat_history)
 
     return base, boat_history, extracted_data
+
+
+def variable_speeds():
+    x1 = np.linspace(2000, 8000, 2000000)
+    y1 = ((0.01 * x1 - 100) ** 2) - 10000
+
+    x1 = np.flip(x1)
+    y1 = np.flip(np.array(y1))
+    chosen = [[x1[0], y1[0]]]
+    distance_tolerance = 1e-9
+    initial_velocity = 0.1
+    final_velocity = 0.3
+    velocity_increment = (0.2/20000)
+    timestamp1 = 100000
+
+    current_velocity = initial_velocity
+    current_position = 0
+    while current_velocity != 0.3:
+        for k in range((current_position+1), len(y1)):
+            if (1 <= k <= 100):
+                print(math.hypot(x1[current_position] - x1[k], y1[current_position] - y1[k]))
+                print("tol1", math.hypot(x1[current_position]-x1[k],y1[current_position]-y1[k]) >= current_velocity - distance_tolerance)
+            if(math.hypot(x1[current_position]-x1[k],y1[current_position]-y1[k]) <= distance_tolerance + current_velocity and math.hypot(x1[current_position]-x1[k],y1[current_position]-y1[k]) >= current_velocity - distance_tolerance):
+                chosen.append([x1[k], y1[k]])
+                current_position = k
+                current_velocity = current_velocity + velocity_increment
+                print("here")
+                break
+
+
+    return chosen
 
 def extract_test_data(timestamp1, boat_data):
     extracted_data = [boat_data[0]]

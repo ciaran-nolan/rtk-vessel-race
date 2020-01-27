@@ -58,6 +58,9 @@ def nonlinear_interpolation_b_spline(base, boat_history):
     ax.plot(x_new, y_new, 'r-')
     ax.plot([0, base[0]], [0, base[1]], marker='o')
     ax.plot(x_intersect, y_intersect, "*k")
+    ax.title.set_text('Non-Linear Interpolation of Boat Relative Position')
+    ax.set_xlabel('Northern Relative Offset (cm)')
+    ax.set_ylabel('Eastern Relative Offset (cm)')
 
 
     return
@@ -86,8 +89,21 @@ def linear_interpolation_shortest_distance(base, boat_history):
             line_status.append(above_below)
 
 
-    plt.plot(timestamp, distances, '-ro')
+    intercept_x = np.linspace(timestamp[0], timestamp[len(timestamp) - 1], len(timestamp))
+    intercept_y = [0] * (len(timestamp))
 
+
+
+    x_intersect, y_intersect = intersection(np.array(timestamp), np.array(distances), np.array(intercept_x), np.array(intercept_y))
+
+    print("Linear Intercept: ", x_intersect[0], y_intersect[0])
+    fig, ax = plt.subplots()
+    ax.plot(x_intersect, y_intersect, '*k')
+    ax.plot(timestamp, distances, '-ro')
+    ax.plot(intercept_x, intercept_y)
+    ax.title.set_text('Linear Interpolation of Shortest Distance to Finish Line')
+    ax.set_xlabel('Time of Week (Milliseconds)')
+    ax.set_ylabel('Shortest Distance (cm)')
 
 
 def nonlinear_interpolation_shortest_distance(base, boat_history):
@@ -131,7 +147,9 @@ def nonlinear_interpolation_shortest_distance(base, boat_history):
     ax.plot(time_new, short_new, 'r-')
     ax.plot(intercept_x, intercept_y)
     ax.plot(x_intersect, y_intersect, '*k')
-    ax.title.set_text('Non-linear, Shortest')
+    ax.title.set_text('Non-Linear Interpolation of Shortest Distance to Finish Line')
+    ax.set_xlabel('Time of Week (Milliseconds)')
+    ax.set_ylabel('Shortest Distance (cm)')
 
 
     return x_intersect[0], y_intersect[0]
