@@ -8,6 +8,18 @@ from intersection import intersection
 import finish_detection
 
 
+
+def linear_interpolation_relposned(base, boat_history):
+    x_pts, y_pts = tools.separate_x_y_coords(boat_history)
+    N = 1000
+    x = np.linspace(0, base[0], N)
+    y = np.linspace(0, base[1], N)
+    x_intersect, y_intersect = intersection(x_pts, y_pts, x, y)
+
+
+
+
+
 def linear_interpolation_positional(base, boat1, boat2, boat3, boat4):
     if np.isnan(boat3) or np.isnan(boat4):
         fig, ax = plt.subplots()
@@ -51,7 +63,7 @@ def nonlinear_interpolation_b_spline(base, boat_history):
     y = np.linspace(0, base[1], N)
 
     x_intersect, y_intersect = intersection(x_new, y_new, x, y)
-    print("Non-linear Intercept: ", x_intersect[0], y_intersect[0])
+   # print("Non-linear Intercept: ", x_intersect[0], y_intersect[0])
 
     fig, ax = plt.subplots()
     ax.plot(x_pts, y_pts, 'ro')
@@ -66,10 +78,12 @@ def nonlinear_interpolation_b_spline(base, boat_history):
     return
 
 
-def linear_interpolation_shortest_distance(base, boat_history):
+def linear_interpolation_shortest_distance(base, boat_history, full_set):
     distances = []
     timestamp = []
     line_status = []
+    crossed_time = []
+    crossed_dist = []
     for i in range(len(boat_history)):
         if i == 0:
             distances.append(distance.pnt2line(boat_history[i])[0])
@@ -82,6 +96,13 @@ def linear_interpolation_shortest_distance(base, boat_history):
             boat_distance = distance.pnt2line(boat_history[i])[0]
             above_below = finish_detection.has_crossed_slope(base, boat_history[i])
             if above_below != line_status[i - 1]:
+                if full_set:
+                    boat_distance = -1 * boat_distance
+                    crossed_dist.append(distances[i-1])
+                    crossed_dist.append(boat_distance)
+                    crossed_time.append(timestamp[i-1])
+                    crossed_time.append(boat_history[i][2])
+                    break
                 boat_distance = -1 * boat_distance
             elif distances[i - 1] < 0:
                 boat_distance = -1 * boat_distance
@@ -91,23 +112,32 @@ def linear_interpolation_shortest_distance(base, boat_history):
 
     intercept_x = np.linspace(timestamp[0], timestamp[len(timestamp) - 1], len(timestamp))
     intercept_y = [0] * (len(timestamp))
+    if(full_set):
+        x_intersect, y_intersect = intersection(np.array(crossed_time), np.array(crossed_dist), np.array(intercept_x),
+                                                np.array(intercept_y))
+        print("Linear Intercept: ", x_intersect[0], y_intersect[0])
+        fig, ax = plt.subplots()
+        ax.plot(x_intersect, y_intersect, '*k')
+        ax.plot(crossed_time, crossed_dist, '-ro')
+        ax.plot(intercept_x, intercept_y)
+        ax.title.set_text('Linear Interpolation of Shortest Distance to Finish Line')
+        ax.set_xlabel('Time of Week (Milliseconds)')
+        ax.set_ylabel('Shortest Distance (cm)')
 
+    else:
+        x_intersect, y_intersect = intersection(np.array(timestamp), np.array(distances), np.array(intercept_x), np.array(intercept_y))
 
-
-    x_intersect, y_intersect = intersection(np.array(timestamp), np.array(distances), np.array(intercept_x), np.array(intercept_y))
-
-    print("Linear Intercept: ", x_intersect[0], y_intersect[0])
-    fig, ax = plt.subplots()
-    ax.plot(x_intersect, y_intersect, '*k')
-    ax.plot(timestamp, distances, '-ro')
-    ax.plot(intercept_x, intercept_y)
-    ax.title.set_text('Linear Interpolation of Shortest Distance to Finish Line')
-    ax.set_xlabel('Time of Week (Milliseconds)')
-    ax.set_ylabel('Shortest Distance (cm)')
+        print("Linear Intercept: ", x_intersect[0], y_intersect[0])
+        fig, ax = plt.subplots()
+        ax.plot(x_intersect, y_intersect, '*k')
+        ax.plot(timestamp, distances, '-ro')
+        ax.plot(intercept_x, intercept_y)
+        ax.title.set_text('Linear Interpolation of Shortest Distance to Finish Line')
+        ax.set_xlabel('Time of Week (Milliseconds)')
+        ax.set_ylabel('Shortest Distance (cm)')
 
 ##Non Linear Interpolation of Data Set Points Using Shortest Distance To Finish Line
 def nonlinear_interpolation_shortest_distance(base, boat_history):
-
     distances = []
     timestamp = []
     line_status = []
@@ -115,13 +145,13 @@ def nonlinear_interpolation_shortest_distance(base, boat_history):
     for i in range(len(boat_history)):
         if i == 0:
             distances.append(distance.pnt2line(boat_history[i])[0])
-
             line_status.append(finish_detection.has_crossed_slope(base, boat_history[i]))
             timestamp.append(boat_history[i][2])
         else:
 
             timestamp.append(boat_history[i][2])
             boat_distance = distance.pnt2line(boat_history[i])[0]
+
             above_below = finish_detection.has_crossed_slope(base, boat_history[i])
             if above_below != line_status[i-1]:
                 boat_distance = -1*boat_distance
@@ -129,7 +159,6 @@ def nonlinear_interpolation_shortest_distance(base, boat_history):
                 boat_distance = -1*boat_distance
             distances.append(boat_distance)
             line_status.append(above_below)
-
 
     tck, u = splprep([timestamp, distances], u=None, s=0.0, per=0)
     u_new = np.linspace(u.min(), u.max(), 1000)

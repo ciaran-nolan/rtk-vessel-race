@@ -2,12 +2,12 @@
 from random import randint
 import numpy as np
 import math
-
+import matplotlib.pyplot as plt
 
 def test45_approach():
     base = [8000, 6000]
 
-    boat_data = [[2000, 990, 110483600], #second 1
+    boat_data = [[2000, 990, 110483600],  # second 1
                  [2000, 1000, 110483600],
                  [2000, 1010, 110483600],
                  [2000, 1020, 110483600],
@@ -211,8 +211,9 @@ def test45_approach():
 
     return base, boat_data
 
+
 def generate_data_45():
-    base = [8000,6000]
+    base = [8000, 6000]
     boat_history = []
     timestamp1 = randint(100000, 600000)
     boat_history.append([2000, 0, 0])
@@ -220,16 +221,17 @@ def generate_data_45():
     for i in range(3001):
         if i == 0:
             continue
-        boat_history.append([2000, i, (boat_history[i-1][2] + 2)])
+        boat_history.append([2000, i, (boat_history[i - 1][2] + 2)])
 
     print(boat_history)
     extracted_data = extract_test_data(timestamp1, boat_history)
     return base, boat_history, extracted_data
 
+
 def generate_slow_turn():
     base = [8000, 6000]
     x = np.linspace(2000, 5000, 3000)
-    y = 0.001*x**2 - 10000
+    y = 0.001 * x ** 2 - 10000
     boat_history = []
     timestamp1 = randint(100000, 600000)
 
@@ -237,12 +239,13 @@ def generate_slow_turn():
         if i == 0:
             boat_history.append([x[i], y[i], timestamp1])
         else:
-            boat_history.append([x[i], y[i], (boat_history[i-1][2]+2)])
+            boat_history.append([x[i], y[i], (boat_history[i - 1][2] + 2)])
 
     print(boat_history)
     extracted_data = extract_test_data(timestamp1, boat_history)
 
     return base, boat_history, extracted_data
+
 
 def generate_tight_tack():
     base = [8000, 6000]
@@ -251,8 +254,8 @@ def generate_tight_tack():
 
     x = np.concatenate((x1, x2), axis=0)
 
-    y1 = 0.001*x1**2 - 10000
-    y2 = (0.1*x2 - 390.596412)**2 - 1000
+    y1 = 0.001 * x1 ** 2 - 10000
+    y2 = (0.1 * x2 - 390.596412) ** 2 - 1000
 
     y = np.concatenate((y1, y2), axis=0)
 
@@ -269,10 +272,11 @@ def generate_tight_tack():
 
     return base, boat_history, extracted_data
 
+
 def upwind_tacks():
     base = [8000, 6000]
     x1 = np.linspace(4000, 4500, 1000)
-    x2 = np.linspace(4501,5000, 998)
+    x2 = np.linspace(4501, 5000, 998)
     x3 = np.flip(np.linspace(4500, 4999, 998))
     x4 = np.linspace(4501, 5000, 998)
     x5 = np.flip(np.linspace(4500, 4999, 998))
@@ -302,34 +306,148 @@ def upwind_tacks():
 
 
 def variable_speeds():
-    x1 = np.linspace(2000, 8000, 2000000)
+    base = [8000, 6000]
+    distance_tolerance = 1e-9
+    #declare functions and spaces
+    # x0 = np.linspace(7000, 10000, 20000)
+    # x0 = np.flip(x0)
+    # y0 = ((0.01 * x0 - 100) ** 2) - 10000
+
+
+    x1 = np.linspace(2000, 10000, 50000)
+    x1 = np.flip(x1)
     y1 = ((0.01 * x1 - 100) ** 2) - 10000
 
-    x1 = np.flip(x1)
-    y1 = np.flip(np.array(y1))
-    chosen = [[x1[0], y1[0]]]
-    distance_tolerance = 1e-9
-    initial_velocity = 0.1
-    final_velocity = 0.3
-    velocity_increment = (0.2/20000)
+    initial_velocity1 = 0.1
+    final_velocity = 6
     timestamp1 = 100000
+    velocity_increment1 = (.1 / 1000)
+    chosen1, chosen1_x, chosen1_y = variable_speed_selector(initial_velocity1, final_velocity, x1, y1, distance_tolerance, velocity_increment1, timestamp1)
 
+
+    x2 = np.linspace(2000, 9000, 7000)
+    y2 = ((0.01 * x2 - 8) ** 2) - 3744
+    initial_velocity2 = 0.1
+    final_velocity2 = 8
+    velocity_increment2 = (4 / 7000)
+    timestamp2 = chosen1[len(chosen1)-1][2] + 1
+    chosen2, chosen2_x, chosen2_y = variable_speed_selector(initial_velocity2, final_velocity2, x2, y2,
+                                                            distance_tolerance, velocity_increment2, timestamp2)
+
+
+    x3 = np.linspace(5990, 9000, 12000)
+    x3 = np.flip(x3)
+    y3 = ((0.01 * x3 - 100) ** 2) + 2880
+    initial_velocity3 = 0.1
+    final_velocity3 = 10
+    velocity_increment3 = (4 / 12000)
+    timestamp3 = chosen2[len(chosen2)-1][2] + 1
+    chosen3, chosen3_x, chosen3_y = variable_speed_selector(initial_velocity3, final_velocity3, x3, y3,
+                                                            distance_tolerance, velocity_increment3, timestamp3)
+
+
+
+    x4 = np.linspace(5990, 9000, 6000)
+    y4 = ((0.02 * x4 - 63.75) ** 2) + 1346.5
+    initial_velocity4 = 0.1
+    final_velocity4 = 0.9
+    velocity_increment4 = (0.4 / 6000)
+    timestamp4 = chosen3[len(chosen3)-1][2] + 1
+    chosen4, chosen4_x, chosen4_y = variable_speed_selector(initial_velocity4, final_velocity4, x4, y4,
+                                                            distance_tolerance, velocity_increment4, timestamp4)
+
+    chosen = chosen1 + chosen2 + chosen3 + chosen4
+    extracted_data = extract_test_data(timestamp1, chosen)
+
+    return base, chosen, extracted_data
+
+def variable_speed_straight_line():
+    base = [8000, 6000]
+    distance_tolerance = 1e-9
+
+
+    x1 = np.linspace(0, 3000, 50000)
+
+    y1 = (6/8)*x1 - 100
+
+    initial_velocity1 = 0.1
+    final_velocity = 6
+    timestamp1 = 100000
+    velocity_increment1 = (1 / 2000)
+    chosen1, chosen1_x, chosen1_y = variable_speed_selector(initial_velocity1, final_velocity, x1, y1,
+                                                            distance_tolerance, velocity_increment1, timestamp1)
+
+    x2 = np.linspace(-10000, 3000, 30000)
+    x2 = np.flip(x2)
+    y2 = -x2 + 5150
+    initial_velocity2 = 0.1
+    final_velocity2 = 5
+    velocity_increment2 = (0.1 / 1000)
+    timestamp2 = chosen1[len(chosen1) - 1][2] + 1
+    chosen2, chosen2_x, chosen2_y = variable_speed_selector(initial_velocity2, final_velocity2, x2, y2,
+                                                            distance_tolerance, velocity_increment2, timestamp2)
+
+    chosen = chosen1 + chosen2
+    extracted_data = extract_test_data(timestamp1, chosen)
+
+    return base, chosen, extracted_data
+
+def variable_speed_single_quadratic():
+    base = [8000, 6000]
+    distance_tolerance = 1e-9
+    x1 = np.linspace(0, 3000, 50000)
+    y1 = 0.001*x1**2 - 1000
+
+    initial_velocity1 = 0.01
+    final_velocity = 8
+    timestamp1 = 100000
+    velocity_increment1 = (0.4 / 2000)
+    chosen1, chosen1_x, chosen1_y = variable_speed_selector(initial_velocity1, final_velocity, x1, y1,
+                                                            distance_tolerance, velocity_increment1, timestamp1)
+    chosen = chosen1
+    extracted_data = extract_test_data(timestamp1, chosen)
+
+    return base, chosen, extracted_data
+
+
+def variable_speed_selector(initial_velocity, maximum_velocity, x, y, tolerance, velocity_increment, timestamp):
     current_velocity = initial_velocity
     current_position = 0
-    while current_velocity != 0.3:
-        for k in range((current_position+1), len(y1)):
-            if (1 <= k <= 100):
-                print(math.hypot(x1[current_position] - x1[k], y1[current_position] - y1[k]))
-                print("tol1", math.hypot(x1[current_position]-x1[k],y1[current_position]-y1[k]) >= current_velocity - distance_tolerance)
-            if(math.hypot(x1[current_position]-x1[k],y1[current_position]-y1[k]) <= distance_tolerance + current_velocity and math.hypot(x1[current_position]-x1[k],y1[current_position]-y1[k]) >= current_velocity - distance_tolerance):
-                chosen.append([x1[k], y1[k]])
+    chosen_x = [x[0]]
+    chosen_y = [y[0]]
+    chosen = [[x[0], y[0], timestamp]]
+    current_timestamp = timestamp + 1
+
+    while current_velocity <= maximum_velocity and current_position != len(x) - 1:
+        if current_velocity >= maximum_velocity:
+            current_velocity = maximum_velocity
+
+        if current_position == len(x) - 1:
+            break
+        for k in range((current_position + 1), len(y)):
+            linear_dist = math.hypot(x[current_position] - x[k], y[current_position] - y[k])
+            if linear_dist <= current_velocity:
+                if k == len(y) - 1:
+                    current_position = len(x) - 1
+                    break
+               # print("here: ", math.hypot(x[current_position] - x[k], y[current_position] - y[k]),  current_velocity, k)
+                continue
+            elif linear_dist >= current_velocity:
+                if linear_dist - current_velocity <= tolerance:
+                    chosen_x.append(x[k])
+                    chosen_y.append(y[k])
+                    chosen.append([x[k], y[k], current_timestamp])
+
+                else:
+                    chosen_x.append(((x[k] - x[k - 1]) / 2) + x[k - 1])
+                    chosen_y.append(((y[k] - y[k - 1]) / 2) + y[k - 1])
+                    chosen.append([((x[k] - x[k - 1]) / 2) + x[k - 1], ((y[k] - y[k - 1]) / 2) + y[k - 1],
+                                   current_timestamp])
+                current_timestamp = current_timestamp + 1
                 current_position = k
                 current_velocity = current_velocity + velocity_increment
-                print("here")
                 break
-
-
-    return chosen
+    return chosen, chosen_x, chosen_y
 
 def extract_test_data(timestamp1, boat_data):
     extracted_data = [boat_data[0]]
@@ -341,3 +459,6 @@ def extract_test_data(timestamp1, boat_data):
             extracted_data.append(boat_data[i])
 
     return extracted_data
+
+if __name__ == "__main__":
+    variable_speeds()

@@ -27,32 +27,63 @@ def simulation():
     boat_ned_3 = [6000, 4000, 110485600]
     boat_ned_4 = [6000, 6000, 110486600]
     boat_ned_5 = []
-
-    chosen = relpos_sim_data.variable_speeds()
-    print(chosen)
-    # base, boat_history, extracted_data = relpos_sim_data.generate_tight_tack()
-    # full_time_approx = interpolation.linear_interpolation_shortest_distance(base_ned.relpos, boat_history)
-    # extracted_approx = interpolation.linear_interpolation_shortest_distance(base_ned.relpos, extracted_data)
-    # interpolation.nonlinear_interpolation_shortest_distance(base, boat_history)
-    # interpolation.nonlinear_interpolation_shortest_distance(base, extracted_data)
-    # interpolation.nonlinear_interpolation_b_spline(base_ned.relpos, boat_history)
-    # plt.show()
-
-
-
-    # input("Press any key to continue")
     #
-    # base, boat_history, extracted_data = relpos_sim_data.upwind_tacks()
-    # full_time_approx = interpolation.linear_interpolation_shortest_distance(base_ned.relpos, boat_history)
-    # #extracted_approx = interpolation.linear_interpolation_shortest_distance(base_ned.relpos, extracted_data)
+    base, boat_history, extracted_data = relpos_sim_data.variable_speed_single_quadratic()
+
+    print("Full data approximation: ")
+    full_time_approx = interpolation.linear_interpolation_shortest_distance(base_ned.relpos, boat_history, True)
+    print("Extracted Data Linear Approximation: ")
+    extracted_approx = interpolation.linear_interpolation_shortest_distance(base_ned.relpos, extracted_data, False)
     # interpolation.nonlinear_interpolation_shortest_distance(base, boat_history)
-    # interpolation.nonlinear_interpolation_shortest_distance(base, extracted_data)
-    # interpolation.nonlinear_interpolation_b_spline(base_ned.relpos, boat_history)
-    # plt.show()
+    print("Extracted Data Non-Linear Approximation")
+    interpolation.nonlinear_interpolation_shortest_distance(base, extracted_data)
+    interpolation.nonlinear_interpolation_b_spline(base_ned.relpos, boat_history)
+
+
+    plt.show()
+
+    input("Press any key to continue")
+
+    base, boat_history, extracted_data = relpos_sim_data.variable_speed_straight_line()
+    print("Full data approximation: ")
+    full_time_approx = interpolation.linear_interpolation_shortest_distance(base_ned.relpos, boat_history, True)
+
+    print("Extracted Data Linear Approximation: ")
+    extracted_approx = interpolation.linear_interpolation_shortest_distance(base_ned.relpos, extracted_data, False)
+    # interpolation.nonlinear_interpolation_shortest_distance(base, boat_history)
+
+    print("Extracted Data Non-Linear Approximation")
+    interpolation.nonlinear_interpolation_shortest_distance(base, extracted_data)
+
+    interpolation.nonlinear_interpolation_b_spline(base_ned.relpos, boat_history)
+    plt.show()
 
 
 
-    # input("Press any key to continue")
+    input("Press any key to continue")
+    base, boat_history, extracted_data = relpos_sim_data.variable_speeds()
+    print("Full data approximation: ")
+    full_time_approx = interpolation.linear_interpolation_shortest_distance(base_ned.relpos, boat_history, True)
+    print("Extracted Data Linear Approximation: ")
+    extracted_approx = interpolation.linear_interpolation_shortest_distance(base_ned.relpos, extracted_data, False)
+    # interpolation.nonlinear_interpolation_shortest_distance(base, boat_history)
+    print("Extracted Data Non-Linear Approximation")
+    interpolation.nonlinear_interpolation_shortest_distance(base, extracted_data)
+    interpolation.nonlinear_interpolation_b_spline(base_ned.relpos, boat_history)
+    interpolation.nonlinear_interpolation_b_spline(base_ned.relpos, extracted_data)
+    plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
     #
     # base, boat_history, extracted_data = relpos_sim_data.generate_slow_turn()
     # full_time_approx = interpolation.linear_interpolation_shortest_distance(base_ned.relpos, boat_history)

@@ -79,3 +79,11 @@ def pnt2line(boat_data):
 
 
     return dist, boat_data[2]
+
+def test_pnt():
+    dist = pnt2line([8000, -3600, 10000])
+    print(dist)
+
+
+if __name__ == "__main__":
+    test_pnt()
