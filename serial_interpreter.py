@@ -1,25 +1,15 @@
-import numpy as np
 import serial
 import ubx_messages
-import math
 import finish_detection
-import interpolation
-import distance
+import classes
 
-
+# open serial communication
 def createserialcommunication():
     ser = serial.Serial()  # open serial port
     ser.port = "COM10"
     ser.baudrate = 19200
     ser.open()
     return ser
-
-
-def perpendicular_distance(base_ned, boat_ned):
-    perpdist = abs((base_ned[1] * boat_ned[0] - base_ned[0] * boat_ned[1])) / (
-        math.sqrt(base_ned[0] ** 2 + base_ned[1] ** 2))
-    print("Perpendicular distance is: ", perpdist)
-    return perpdist
 
 
 def equation_calculation(base_ned, boat_ned):
@@ -53,11 +43,15 @@ def main():
         checknum = ubx_messages.check_bytes(s)
 
     base_vector = ubx_messages.ubxnavrelposned(s)
+    base = classes.base(base_vector)
+
     # base_vector = [-1684.44, -2476.23, 37.8]
     print(base_vector)
+
     input("Press any key to begin")
     # base_vector = ubx_messages.ubxnavrelposned(s)
-    finish_detection.has_crossed_line_angle(base_vector, s)
+    #finish_detection.has_crossed_line_angle(base_vector, s)
+    finish_detection.has_crossed_slope(base)
     print("Receiver has crossed line")
 
     return 0

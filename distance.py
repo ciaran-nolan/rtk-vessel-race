@@ -57,10 +57,10 @@ def add(v, w):
 # 10 Translate nearest back to the start/end line.
 # Malcolm Kesson 16 Dec 2012
 
-def pnt2line(boat_data):
+def pnt2line(boat_data, base_data):
     pnt = boat_data[0:2]
     start = [0, 0]
-    end = simulation.base_ned.relpos
+    end = base_data
     line_vec = vector(start, end)
     pnt_vec = vector(start, pnt)
     line_len = length(line_vec)
@@ -73,15 +73,13 @@ def pnt2line(boat_data):
         t = 1.0
     nearest = scale(line_vec, t)
     dist = distance(nearest, pnt_vec)
-    # if dist < 1e-9:
-    #    dist = 0
     nearest = list(add(nearest, start))
 
 
     return dist, boat_data[2]
 
 def test_pnt():
-    dist = pnt2line([8000, -3600, 10000])
+    dist, time = pnt2line([0, -3600, 10000], [6000, 8000])
     print(dist)
 
 
