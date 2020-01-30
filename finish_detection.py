@@ -64,11 +64,9 @@ def has_crossed_line_equation(base_ned, ser):
     return
 
 
-def has_crossed_slope(base, boat):
+def has_crossed_slope(base, boat_ned):
 
-    crossed_line = False
     # read in
-
     if boat_ned[1] * base.position[0] > base.position[1] * boat_ned[0]:
         return 0
     else:

@@ -102,6 +102,6 @@ def ubxnavrelposned(ser):
     print(timeweek)
     #lineardistance = math.sqrt(resolvedn**2+resolvede**2)/100
     #print(lineardistance)
-    return [relposn[0], relpose[0], relposd[0]]
+    return [relposn[0], relpose[0], relposd[0], timeweek[0]]
 
 

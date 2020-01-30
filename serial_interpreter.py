@@ -2,6 +2,7 @@ import serial
 import ubx_messages
 import finish_detection
 import classes
+import interpolation
 
 # open serial communication
 def createserialcommunication():
@@ -35,6 +36,34 @@ def read_sample_relposned(ser):
 
     return [a, b, c, d]
 
+# function to maintain a log of a given boat
+def boat_tracker(base, boat, s):
+    crossed_line = False
+    above_below_previous = None
+    checknum = ubx_messages.check_bytes(s)
+    while checknum != 1:
+        checknum = ubx_messages.check_bytes(s)
+
+    while not crossed_line:
+        current_boat_ned = ubx_messages.ubxnavrelposned(s)
+        current_above_below = finish_detection.has_crossed_slope(base.position, current_boat_ned)
+        if above_below_previous is None:
+            above_below_previous = current_above_below
+        elif above_below_previous != current_above_below:
+            crossed_line = True
+        current_boat_ned.append(current_above_below)
+        boat.update_position_history(current_boat_ned)
+
+    #
+    for position in range(len(boat.boat_history_limit-2)):
+        current_boat_ned = ubx_messages.ubxnavrelposned(s)
+        current_above_below = finish_detection.has_crossed_slope(base.position, current_boat_ned)
+        current_boat_ned.append(current_above_below)
+        boat.update_position_history(current_boat_ned)
+
+    interpolation.nonlinear_interpolation_shortest_distance(base.position, boat.boat_history)
+
+   
 
 def main():
     s = createserialcommunication()
@@ -45,13 +74,13 @@ def main():
     base_vector = ubx_messages.ubxnavrelposned(s)
     base = classes.base(base_vector)
 
-    # base_vector = [-1684.44, -2476.23, 37.8]
-    print(base_vector)
-
     input("Press any key to begin")
+
+    boat = classes.boat(20, 1, None)
+    boat_tracker(base, boat, s)
     # base_vector = ubx_messages.ubxnavrelposned(s)
     #finish_detection.has_crossed_line_angle(base_vector, s)
-    finish_detection.has_crossed_slope(base)
+    finish_detection.has_crossed_slope(base, s)
     print("Receiver has crossed line")
 
     return 0
