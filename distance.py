@@ -60,7 +60,7 @@ def add(v, w):
 def pnt2line(boat_data, base_data):
     pnt = boat_data[0:2]
     start = [0, 0]
-    end = base_data
+    end = base_data[0:2]
     line_vec = vector(start, end)
     pnt_vec = vector(start, pnt)
     line_len = length(line_vec)

@@ -152,13 +152,13 @@ def nonlinear_interpolation_shortest_distance(base, boat_history):
 
     for i in range(len(boat_history)):
         if i == 0:
-            distances.append(distance.pnt2line(boat_history[i])[0])
+            distances.append(distance.pnt2line(boat_history[i], base.position)[0])
             line_status.append(finish_detection.has_crossed_slope(base, boat_history[i]))
             timestamp.append(boat_history[i][2])
 
         else:
             timestamp.append(boat_history[i][2])
-            boat_distance = distance.pnt2line(boat_history[i])[0]
+            boat_distance = distance.pnt2line(boat_history[i], base.position)[0]
             above_below = finish_detection.has_crossed_slope(base, boat_history[i])
 
             if above_below != line_status[i - 1]:
@@ -169,6 +169,54 @@ def nonlinear_interpolation_shortest_distance(base, boat_history):
 
             distances.append(boat_distance)
             line_status.append(above_below)
+
+    tck, u = splprep([timestamp, distances], u=None, s=0.0, per=0)
+    u_new = np.linspace(u.min(), u.max(), 1000)
+    time_new, short_new = splev(u_new, tck, der=0)
+
+    intercept_x = np.linspace(timestamp[0], timestamp[len(timestamp) - 1], len(timestamp))
+    intercept_y = np.zeros(len(timestamp))
+
+    x_intersect, y_intersect = intersection(time_new, short_new, intercept_x, intercept_y)
+
+    print("Non-linear Intercept: ", x_intersect[0], y_intersect[0])
+
+    fig, ax = plt.subplots()
+    ax.plot(timestamp, distances, 'ro')
+    ax.plot(time_new, short_new, 'r-')
+    ax.plot(intercept_x, intercept_y)
+    ax.plot(x_intersect, y_intersect, '*k')
+    ax.title.set_text('Non-Linear Interpolation of Shortest Distance to Finish Line')
+    ax.set_xlabel('Time of Week (Milliseconds)')
+    ax.set_ylabel('Shortest Distance (cm)')
+
+    return x_intersect[0], y_intersect[0]
+
+
+##Non Linear Interpolation of Data Set Points Using Shortest Distance To Finish Line
+def nonlinear_interpolation_shortest_distance_real_time(base, boat_history):
+    np.unique(boat_history, axis=0)
+    distances = []
+    timestamp = []
+    line_status = []
+
+    for i in range(len(boat_history)):
+        if i == 0:
+            distances.append(distance.pnt2line(boat_history[i])[0])
+            line_status.append(finish_detection.has_crossed_slope(base, boat_history[i]))
+            timestamp.append(boat_history[i][2])
+
+        else:
+            timestamp.append(boat_history[i][2])
+            boat_distance = distance.pnt2line(boat_history[i])[0]
+
+            if boat_history[i][3] != boat_history[i - 1][3]:
+                boat_distance = -1 * boat_distance
+
+            elif  boat_history[i - 1][3] < 0:
+                boat_distance = -1 * boat_distance
+
+            distances.append(boat_distance)
 
     tck, u = splprep([timestamp, distances], u=None, s=0.0, per=0)
     u_new = np.linspace(u.min(), u.max(), 1000)

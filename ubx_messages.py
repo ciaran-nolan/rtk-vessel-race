@@ -69,8 +69,8 @@ def ubxnavposllh(ser):
 
 
 def ubxnavrelposned(ser):
-    #bytes = ser.read(46)
-    bytes=b'\xb5b\x01<(\x00\x00\x00\x00\x00\x88r3"*\x01\x00\x00\xe5\x01\x00\x00B\xff\xff\xff68\xde\x00\xee\x0e\x00\x00'
+    bytes = ser.read(46)
+   # bytes=b'\xb5b\x01<(\x00\x00\x00\x00\x00\x88r3"*\x01\x00\x00\xe5\x01\x00\x00B\xff\xff\xff68\xde\x00\xee\x0e\x00\x00'
     #headerbyte1 = bytes[0]
     #headerbyte2 = bytes[1]
     #class_byte = bytes[0]
@@ -102,6 +102,6 @@ def ubxnavrelposned(ser):
     print(timeweek)
     #lineardistance = math.sqrt(resolvedn**2+resolvede**2)/100
     #print(lineardistance)
-    return [relposn[0], relpose[0], relposd[0], timeweek[0]]
+    return [relposn[0], relpose[0], relposd[0], timeweek]
 
 

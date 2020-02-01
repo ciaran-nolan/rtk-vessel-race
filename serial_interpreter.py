@@ -3,11 +3,11 @@ import ubx_messages
 import finish_detection
 import classes
 import interpolation
-
+import matplotlib.pyplot as plt
 # open serial communication
 def createserialcommunication():
     ser = serial.Serial()  # open serial port
-    ser.port = "COM10"
+    ser.port = "COM5"
     ser.baudrate = 19200
     ser.open()
     return ser
@@ -46,22 +46,26 @@ def boat_tracker(base, boat, s):
 
     while not crossed_line:
         current_boat_ned = ubx_messages.ubxnavrelposned(s)
-        current_above_below = finish_detection.has_crossed_slope(base.position, current_boat_ned)
+        print(current_boat_ned)
+        current_above_below = finish_detection.has_crossed_slope(base, current_boat_ned)
         if above_below_previous is None:
             above_below_previous = current_above_below
         elif above_below_previous != current_above_below:
+            print("Boat has crossed the line")
             crossed_line = True
         current_boat_ned.append(current_above_below)
         boat.update_position_history(current_boat_ned)
 
     #
-    for position in range(len(boat.boat_history_limit-2)):
+    for position in range(boat.boat_history_limit-2):
         current_boat_ned = ubx_messages.ubxnavrelposned(s)
-        current_above_below = finish_detection.has_crossed_slope(base.position, current_boat_ned)
+        current_above_below = finish_detection.has_crossed_slope(base, current_boat_ned)
         current_boat_ned.append(current_above_below)
         boat.update_position_history(current_boat_ned)
 
-    interpolation.nonlinear_interpolation_shortest_distance(base.position, boat.boat_history)
+    interpolation.nonlinear_interpolation_shortest_distance(base, boat.boat_history)
+    plt.show()
+    return
 
    
 
@@ -73,14 +77,15 @@ def main():
 
     base_vector = ubx_messages.ubxnavrelposned(s)
     base = classes.base(base_vector)
-
+    print(base.position)
     input("Press any key to begin")
 
     boat = classes.boat(20, 1, None)
     boat_tracker(base, boat, s)
     # base_vector = ubx_messages.ubxnavrelposned(s)
     #finish_detection.has_crossed_line_angle(base_vector, s)
-    finish_detection.has_crossed_slope(base, s)
+    boat_tracker(base, boat, s)
+    #finish_detection.has_crossed_slope(base, s)
     print("Receiver has crossed line")
 
     return 0
