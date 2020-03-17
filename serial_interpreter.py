@@ -4,6 +4,7 @@ import finish_detection
 import classes
 import interpolation
 import matplotlib.pyplot as plt
+from bitstring import BitArray
 # open serial communication
 def createserialcommunication():
     ser = serial.Serial()  # open serial port
@@ -77,7 +78,24 @@ def boat_tracker(base, boat, s):
 
     return
 
-   
+def stream_serial():
+
+    s = createserialcommunication()
+    data_sizes = []
+    temp = 0
+    for x in range(100):
+
+        line1 = BitArray(s.read(1))
+        print(line1, temp)
+        line2 = BitArray(s.read(2))
+        data_size = int(line2.bin[6:], 2)
+        data_sizes.append(data_size)
+        print(data_size)
+        s.read(data_size+3)
+        temp = line1
+
+
+    print(data_sizes)
 
 def main():
     s = createserialcommunication()
@@ -111,6 +129,5 @@ def check_time():
         current_boat_ned = ubx_messages.ubxnavrelposned(s)
         print(current_boat_ned[3])
 
-
 if __name__ == "__main__":
-    main()
+    stream_serial()

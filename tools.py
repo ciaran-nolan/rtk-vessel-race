@@ -1,6 +1,5 @@
-import numpy as np
-import math
 
+from math import radians, cos, sin, asin, sqrt
 
 def separate_x_y_coords(coordinate_list):
     x = [i[0] for i in coordinate_list]
@@ -16,6 +15,43 @@ def shortest_distance(distance_data):
 
 def perpendicular_distance(base_ned, boat_ned):
     perpdist = abs((base_ned[1] * boat_ned[0] - base_ned[0] * boat_ned[1])) / (
-        math.sqrt(base_ned[0] ** 2 + base_ned[1] ** 2))
+        sqrt(base_ned[0] ** 2 + base_ned[1] ** 2))
     print("Perpendicular distance is: ", perpdist)
     return perpdist
+
+
+# Python 3 program to calculate Distance Between Two Points on Earth
+
+
+
+def distance(lat1, lat2, lon1, lon2):
+    # The math module contains a function named
+    # radians which converts from degrees to radians.
+    lon1 = radians(lon1)
+    lon2 = radians(lon2)
+    lat1 = radians(lat1)
+    lat2 = radians(lat2)
+
+    # Haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+
+    c = 2 * asin(sqrt(a))
+
+    # Radius of earth in kilometers. Use 3956 for miles
+    r = 6371
+
+    # calculate the result
+    return (c * r)
+
+def tools_main():
+    # driver code
+    lat1 = 52.79271561
+    lat2 = 52.792725724
+    lon1 = -6.139479904
+    lon2 = -6.139467550
+    print(distance(lat1, lat2, lon1, lon2), "K.M")
+
+if __name__ == "__main__":
+    tools_main()
