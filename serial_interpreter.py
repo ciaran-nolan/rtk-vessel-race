@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 # open serial communication
 def createserialcommunication():
     ser = serial.Serial()  # open serial port
-    ser.port = "COM5"
+    ser.port = "COM12"
     ser.baudrate = 19200
     ser.open()
     return ser
@@ -38,13 +38,16 @@ def read_sample_relposned(ser):
 
 # function to maintain a log of a given boat
 def boat_tracker(base, boat, s):
+
     crossed_line = False
     above_below_previous = None
-    checknum = ubx_messages.check_bytes(s)
-    while checknum != 1:
-        checknum = ubx_messages.check_bytes(s)
+
+    s.flush()
 
     while not crossed_line:
+        checknum = ubx_messages.check_bytes(s)
+        while checknum != 1:
+            checknum = ubx_messages.check_bytes(s)
         current_boat_ned = ubx_messages.ubxnavrelposned(s)
         print(current_boat_ned)
         current_above_below = finish_detection.has_crossed_slope(base, current_boat_ned)
@@ -57,14 +60,21 @@ def boat_tracker(base, boat, s):
         boat.update_position_history(current_boat_ned)
 
     #
-    for position in range(boat.boat_history_limit-2):
+    for position in range(9):
+        checknum = ubx_messages.check_bytes(s)
+        while checknum != 1:
+            checknum = ubx_messages.check_bytes(s)
         current_boat_ned = ubx_messages.ubxnavrelposned(s)
+        print(current_boat_ned)
         current_above_below = finish_detection.has_crossed_slope(base, current_boat_ned)
         current_boat_ned.append(current_above_below)
         boat.update_position_history(current_boat_ned)
 
+    print(boat.boat_history)
     interpolation.nonlinear_interpolation_shortest_distance(base, boat.boat_history)
+    interpolation.linear_interpolation_shortest_distance(base, boat.boat_history, False)
     plt.show()
+
     return
 
    
@@ -76,10 +86,11 @@ def main():
         checknum = ubx_messages.check_bytes(s)
 
     base_vector = ubx_messages.ubxnavrelposned(s)
-    base = classes.base(base_vector)
+    print(base_vector)
+    base = classes.base([-325, -300, 32, 207922000])
     print(base.position)
-    input("Press any key to begin")
 
+    input("Press any key to begin")
     boat = classes.boat(20, 1, None)
     boat_tracker(base, boat, s)
     # base_vector = ubx_messages.ubxnavrelposned(s)
@@ -90,6 +101,15 @@ def main():
 
     return 0
 
+def check_time():
+    while True:
+        s = createserialcommunication()
+        checknum = ubx_messages.check_bytes(s)
+        while checknum != 1:
+            checknum = ubx_messages.check_bytes(s)
+
+        current_boat_ned = ubx_messages.ubxnavrelposned(s)
+        print(current_boat_ned[3])
 
 
 if __name__ == "__main__":

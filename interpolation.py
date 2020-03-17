@@ -90,13 +90,13 @@ def linear_interpolation_shortest_distance(base, boat_history, full_set):
 
     for i in range(len(boat_history)):
         if i == 0:
-            distances.append(distance.pnt2line(boat_history[i])[0])
+            distances.append(distance.pnt2line(boat_history[i], base.position)[0])
             line_status.append(finish_detection.has_crossed_slope(base, boat_history[i]))
-            timestamp.append(boat_history[i][2])
+            timestamp.append(boat_history[i][3])
 
         else:
-            timestamp.append(boat_history[i][2])
-            boat_distance = distance.pnt2line(boat_history[i])[0]
+            timestamp.append(boat_history[i][3])
+            boat_distance = distance.pnt2line(boat_history[i], base.position)[0]
             above_below = finish_detection.has_crossed_slope(base, boat_history[i])
 
             if above_below != line_status[i - 1]:
@@ -154,10 +154,10 @@ def nonlinear_interpolation_shortest_distance(base, boat_history):
         if i == 0:
             distances.append(distance.pnt2line(boat_history[i], base.position)[0])
             line_status.append(finish_detection.has_crossed_slope(base, boat_history[i]))
-            timestamp.append(boat_history[i][2])
+            timestamp.append(boat_history[i][3])
 
         else:
-            timestamp.append(boat_history[i][2])
+            timestamp.append(boat_history[i][3])
             boat_distance = distance.pnt2line(boat_history[i], base.position)[0]
             above_below = finish_detection.has_crossed_slope(base, boat_history[i])
 

@@ -55,7 +55,7 @@ def ubxnavposllh(ser):
     overhead = bytes[2]
     overhead2 = bytes[3]
     message_size = int.from_bytes(bytes[4:6],"little")
-    timeweek = struct.unpack("<i",bytes[10:14])
+    timeweek = struct.unpack("<I",bytes[10:14])
     longitude = struct.unpack("<i",bytes[10:14])
     revisedlongitude = longitude[0] * 1e-7
     latitude = struct.unpack("<I",bytes[14:18])
