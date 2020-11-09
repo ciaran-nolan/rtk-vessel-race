@@ -1,7 +1,8 @@
-from collections import deque
-
+# Class script for instantiating base and boat classes
+# This is used in simulation.py
 class boat:
     def __init__(self, boat_history_limit, boat_ident, first_reported_position):
+        # specifies the size of the buffer to hold relative positions
         self.boat_history_limit = boat_history_limit
         self.identification = boat_ident
         self.latest_position_marker = 0
@@ -12,7 +13,7 @@ class boat:
             self.boat_history = [first_reported_position]
 
     def update_position_history(self, reported_position):
-        #the history buffer is full, need to remove oldest entry
+        # the history buffer is full, need to remove oldest entry
         if len(self.boat_history) == self.boat_history_limit:
             #check if most recent is the last element
             self.boat_history.pop(0)

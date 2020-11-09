@@ -2,10 +2,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 """
+Note this file was created by Sukhbinder Singh
+Usage is based on the MIT license provided
+
+Link to original: https://github.com/sukhbinder/intersection/blob/master/
 Sukhbinder
 5 April 2017
-Based on:
+
+
+This allows points of intersection between both linear and nonlinear data sets to be made.
+In the case of this project interpolated data points
 """
+
 
 def _rect_inter_inner(x1, x2):
     n1 = x1.shape[0] - 1

@@ -5,23 +5,17 @@ import classes
 import interpolation
 import matplotlib.pyplot as plt
 from bitstring import BitArray
+
+
 # open serial communication
 def createserialcommunication():
     ser = serial.Serial()  # open serial port
-    ser.port = "COM12"
+    ser.port = "COM19"
     ser.baudrate = 19200
     ser.open()
     return ser
 
-
-def equation_calculation(base_ned, boat_ned):
-    m = base_ned[1] / base_ned[0]
-
-    if boat_ned[1] > boat_ned[0] * m:
-        return False
-    return True
-
-
+# read a set of 4 sample relative position messages for observation
 def read_sample_relposned(ser):
     ubx_messages.isrelposned(ser)
     a = ubx_messages.ubxnavrelposned(ser)
@@ -38,6 +32,8 @@ def read_sample_relposned(ser):
     return [a, b, c, d]
 
 # function to maintain a log of a given boat
+# tracks a boat across a line and informs Python terminal of:
+# Finish, and Interpolated Finish Time
 def boat_tracker(base, boat, s):
 
     crossed_line = False
@@ -46,21 +42,27 @@ def boat_tracker(base, boat, s):
     s.flush()
 
     while not crossed_line:
+        # ensure incoming data is UBX
         checknum = ubx_messages.check_bytes(s)
         while checknum != 1:
             checknum = ubx_messages.check_bytes(s)
+        # extract the boat's relative position message
         current_boat_ned = ubx_messages.ubxnavrelposned(s)
         print(current_boat_ned)
+        # check if the boat is above or below the finish line
         current_above_below = finish_detection.has_crossed_slope(base, current_boat_ned)
+
         if above_below_previous is None:
             above_below_previous = current_above_below
+        # check if the previous above below line detection is different to current
+        # this covers both finish line orientations
         elif above_below_previous != current_above_below:
             print("Boat has crossed the line")
             crossed_line = True
         current_boat_ned.append(current_above_below)
         boat.update_position_history(current_boat_ned)
 
-    #
+    # range 9 a further 10 data points collected after line crossing
     for position in range(9):
         checknum = ubx_messages.check_bytes(s)
         while checknum != 1:
@@ -72,30 +74,30 @@ def boat_tracker(base, boat, s):
         boat.update_position_history(current_boat_ned)
 
     print(boat.boat_history)
+    # calculate linear and non-linear interpolation
     interpolation.nonlinear_interpolation_shortest_distance(base, boat.boat_history)
     interpolation.linear_interpolation_shortest_distance(base, boat.boat_history, False)
     plt.show()
 
     return
 
+#function for simply streaming RTCM over serial port for observation
 def stream_serial():
 
     s = createserialcommunication()
-    data_sizes = []
-    temp = 0
-    for x in range(100):
+    preamble = BitArray(s.read(1))
+    bytes = BitArray(s.read(2))
+    data_size = int(bytes.bin[6:], 2)
+    data_crc = BitArray(s.read(data_size + 3))
 
-        line1 = BitArray(s.read(1))
-        print(line1, temp)
-        line2 = BitArray(s.read(2))
-        data_size = int(line2.bin[6:], 2)
-        data_sizes.append(data_size)
-        print(data_size)
-        s.read(data_size+3)
-        temp = line1
+    string = str(preamble + bytes + data_crc)
+    # write to file for observation
+    with open('1087.txt', 'w') as f:
+        f.write(string)
+
+    print(data_size)
 
 
-    print(data_sizes)
 
 def main():
     s = createserialcommunication()

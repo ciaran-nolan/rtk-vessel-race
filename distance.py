@@ -1,43 +1,15 @@
-import math
-import simulation
+# This Python Script is an adaptation of the methods employed
+# by Malcolm Kesson
+# This Script Calculates the shortest distance from a point
+# (NED Offset) to a line Segment (Finish Line)
+# The result will return one of three answers:
+# The location of the boat is closest to one of the two endpoints of the
+# finish line,
+# or the shortest distance is the perpendicular distance.
+# A full explanation can be found in the report.
+# Note the variable conventions are inline with Python 2.x
 
-def dot(v, w):
-    x, y = v
-    X, Y = w
-    return x * X + y * Y
-
-
-def length(v):
-    x, y = v
-    return math.sqrt(x * x + y * y)
-
-
-def vector(b, e):
-    x, y = b
-    X, Y = e
-    return (X - x, Y - y)
-
-
-def unit(v):
-    x, y = v
-    mag = length(v)
-    return x / mag, y / mag
-
-
-def distance(p0, p1):
-    return length(vector(p0, p1))
-
-
-def scale(v, sc):
-    x, y = v
-    return x * sc, y * sc
-
-
-def add(v, w):
-    x, y = v
-    X, Y = w
-    return x + X, y + Y
-
+# As per Malcolm Kessen Instructions:
 
 # Given a line with coordinates 'start' and 'end' and the
 # coordinates of a point 'pnt' the proc returns the shortest
@@ -57,6 +29,55 @@ def add(v, w):
 # 10 Translate nearest back to the start/end line.
 # Malcolm Kesson 16 Dec 2012
 
+import math
+
+
+# Calculate the dot product of two 2D vectors v, w
+def dot(v, w):
+    # Unpack the vectors into thei x and y coordinates
+    x, y = v
+    X, Y = w
+    return x * X + y * Y
+
+
+# find the length of a vector from the origin
+def length(v):
+    x, y = v
+    return math.sqrt(x * x + y * y)
+
+
+# find the difference between two vectors
+def vector(b, e):
+    x, y = b
+    X, Y = e
+    return (X - x, Y - y)
+
+
+# find the unit length of the vector
+def unit(v):
+    x, y = v
+    mag = length(v)
+    return x / mag, y / mag
+
+
+# find the distanec between two points
+def distance(p0, p1):
+    return length(vector(p0, p1))
+
+
+# Scale a vector by scaling fact sc
+def scale(v, sc):
+    x, y = v
+    return x * sc, y * sc
+
+
+# compute vector addition
+def add(v, w):
+    x, y = v
+    X, Y = w
+    return x + X, y + Y
+
+
 def pnt2line(boat_data, base_data):
     pnt = boat_data[0:2]
     start = [0, 0]
@@ -75,9 +96,9 @@ def pnt2line(boat_data, base_data):
     dist = distance(nearest, pnt_vec)
     nearest = list(add(nearest, start))
 
-
     return dist, boat_data[2]
 
+# Basic function to test script functionality
 def test_pnt():
     dist, time = pnt2line([0, -3600, 10000], [6000, 8000])
     print(dist)
